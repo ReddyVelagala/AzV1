@@ -1,0 +1,40 @@
+ALTER Procedure [dbo].[SP_UKHPI] (
+    @Property_Type varchar(50)=''
+	,@PropertyTenure Varchar(MAX) = null
+	,@Column13 Varchar(max) = null
+)
+as
+begin
+
+	DECLARE @SQL vARCHAR(MAX) =''
+
+	SET @SQL = 'SELECT  * from [dapper].[VUKHousePriceIndex] WHERE 1 = 1 '
+	IF(ISNULL(@Property_Type,'') <>'')
+	SET @SQL = @SQL + ' AND PROPERTYTYPE = ''' +  @Property_Type  +''''
+
+	if(ISNULL(@PropertyTenure,'')<>'')
+	BEGIN
+		IF(RIGHT(@PropertyTenure,1) =',') 
+			SET @PropertyTenure = SUBSTRING(@PropertyTenure,1,LEN(@PropertyTenure)-1)
+		IF(LEFT(@PropertyTenure,1)=',')
+			SET @PropertyTenure = SUBSTRING(@PropertyTenure,2,LEN(@PropertyTenure))
+
+		SET @PropertyTenure = '''' + Replace(@PropertyTenure,',' ,''',''') + '''' 
+
+		 SET @SQL = @SQL + ' AND [PropertyTenure] IN (' +  @PropertyTenure + ')'
+	END
+	IF( ISNULL(@Column13,'') <>'')
+	BEGIN
+		IF(RIGHT(@Column13,1) =',') 
+			SET @Column13 = SUBSTRING(@Column13,1,LEN(@Column13)-1)
+		IF(LEFT(@Column13,1)=',')
+			SET @Column13 = SUBSTRING(@Column13,2,LEN(@Column13))
+
+		SET @Column13 = '''' + Replace(@Column13,',' ,''',''') + '''' 
+
+	   SET @SQL = @SQL + ' AND COLUMN13 IN (' +  @Column13 + ')'
+	END
+	PRINT @SQL
+	EXEC(@SQL)
+	   
+end
